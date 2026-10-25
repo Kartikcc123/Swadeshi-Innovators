@@ -13,6 +13,7 @@ dotenv.config();
 const app = express();
 const port = process.env.PORT || 5000;
 const currentDirectory = path.dirname(fileURLToPath(import.meta.url));
+const clientDistDirectory = path.resolve(currentDirectory, '../../client/dist');
 const visitorQuestionsFile = path.resolve(currentDirectory, '../data/visitor-questions.xlsx');
 const visitorQuestionHeaders = ['Submitted at', 'Visitor name', 'Mobile number', 'Question', 'Question source'];
 let questionWorkbookQueue = Promise.resolve();
@@ -106,6 +107,15 @@ app.post('/api/inquiries', async (req, res) => {
 
   return res.status(201).json({ message: 'Thanks — the Swadeshi Innovators team will be in touch.' });
 });
+
+// Production hosting: Render starts this Express server after `npm run build` creates client/dist.
+// Static files are served directly, while frontend URLs load the React single-page app.
+if (fs.existsSync(clientDistDirectory)) {
+  app.use(express.static(clientDistDirectory));
+  app.get('*', (_req, res) => res.sendFile(path.join(clientDistDirectory, 'index.html')));
+} else {
+  console.warn(`Client build not found at ${clientDistDirectory}. Run \`npm run build\` before starting the production server.`);
+}
 
 async function startServer() {
   if (process.env.MONGO_URI) {

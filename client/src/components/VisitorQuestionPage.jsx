@@ -15,6 +15,7 @@ import {
   Video,
 } from 'lucide-react';
 import { BRAND_CONFIG, DEMO_VIDEO_CONFIG } from '../data/websiteContent';
+import { apiUrl } from '../data/api';
 
 const FAQS = [
   {
@@ -97,7 +98,7 @@ export function VisitorQuestionPage() {
     setStatus({ state: 'loading', message: '' });
 
     try {
-      const response = await fetch('/api/visitor-questions', {
+      const response = await fetch(apiUrl('/api/visitor-questions'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

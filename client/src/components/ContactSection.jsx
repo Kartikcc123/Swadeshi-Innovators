@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Mail, MessageSquare, Send, CheckCircle2, AlertCircle, Building, Handshake, Lightbulb } from 'lucide-react';
 import { BRAND_CONFIG } from '../data/websiteContent';
+import { apiUrl } from '../data/api';
 
 export function ContactSection() {
   const [form, setForm] = useState({ name: '', email: '', category: 'collaboration', message: '' });
@@ -20,7 +21,7 @@ export function ContactSection() {
     setStatus({ state: 'loading', message: 'Submitting enquiry…' });
 
     try {
-      const response = await fetch('/api/inquiries', {
+      const response = await fetch(apiUrl('/api/inquiries'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

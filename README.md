@@ -1,5 +1,60 @@
 # Swadeshi Innovators — Weave Kiran
 
+## Deploy on Render
+
+Use **two Render services**. The Static Site makes the website fast and public; the Web Service receives form submissions and writes the Excel file.
+
+| Service | Purpose | Render type |
+| --- | --- | --- |
+| Frontend | Website and `/visitor-question` page | Static Site |
+| Backend | APIs and Excel question saving | Web Service |
+
+### 1. Keep the existing API Web Service
+
+Keep `https://swadeshi-innovators.onrender.com` as a **Web Service**. Use these settings:
+
+| Render setting | Value |
+| --- | --- |
+| Root directory | Leave blank |
+| Build command | `npm install && npm run build` |
+| Start command | `npm start` |
+| Environment | `Node` |
+
+Its API remains available at `https://swadeshi-innovators.onrender.com/api/visitor-questions`.
+
+### 2. Create the Static Site
+
+In Render, click **New +** → **Static Site**, select this same repository, then use:
+
+| Render setting | Value |
+| --- | --- |
+| Root directory | Leave blank |
+| Build command | `npm install && npm run build --workspace client` |
+| Publish directory | `client/dist` |
+
+In the Static Site **Environment** section, add:
+
+| Key | Value |
+| --- | --- |
+| `VITE_API_BASE_URL` | `https://swadeshi-innovators.onrender.com` |
+| `VITE_EVENT_QR_URL` | `https://YOUR-STATIC-SITE.onrender.com/visitor-question` |
+
+Replace `YOUR-STATIC-SITE` with the Static Site URL given by Render. Deploy again after adding the variables because Vite includes them during the build.
+
+### 3. Add the page rewrite
+
+In the Static Site dashboard, open **Redirects/Rewrites** and add this rule:
+
+| Source | Destination | Action |
+| --- | --- | --- |
+| `/*` | `/index.html` | Rewrite |
+
+This makes direct links such as `/visitor-question` open the React page instead of showing a 404.
+
+> A Static Site cannot create or save an Excel file by itself. Keep the backend Web Service running so the question form and contact form continue to work.
+
+> Render's local Web Service filesystem is temporary. For reliable event records, move visitor-question data to MongoDB, a Render Disk, or another persistent storage service instead of relying only on `server/data/visitor-questions.xlsx`.
+
 <div align="center">
 
 ![Swadeshi Innovators Logo](./client/public/assets/swadeshi_logo.png)
