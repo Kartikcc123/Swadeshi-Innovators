@@ -25,7 +25,7 @@ export const BRAND_CONFIG = {
     'Smart Inspection',
     'Sustainable Textiles',
   ],
-  contactEmail: 'contact@swadeshi-innovators.org',
+  contactEmail: 'contact@swadeshiinnovators.tech',
   competitionVenue: 'Sanrachna IQTSX 2026 Innovation Showcase',
 };
 
