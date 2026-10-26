@@ -7,6 +7,7 @@ import { fileURLToPath } from 'node:url';
 import mongoose from 'mongoose';
 import XLSX from 'xlsx';
 import { Inquiry } from './models/Inquiry.js';
+import { VisitorQuestion } from './models/VisitorQuestion.js';
 
 dotenv.config();
 
@@ -77,15 +78,54 @@ app.post('/api/visitor-questions', async (req, res) => {
   };
 
   try {
-    // Queue writes so simultaneous event submissions do not overwrite one another.
+    // Save to MongoDB for persistence across server restarts/redeploys.
+    if (mongoose.connection.readyState === 1) {
+      await VisitorQuestion.create(visitorQuestion);
+    } else {
+      console.warn('[visitor-question:fallback] MongoDB not connected, writing to Excel only.');
+    }
+
+    // Also write to local Excel file as a secondary backup.
     questionWorkbookQueue = questionWorkbookQueue
       .catch(() => undefined)
-      .then(() => saveVisitorQuestion(visitorQuestion));
-    await questionWorkbookQueue;
+      .then(() => saveVisitorQuestion(visitorQuestion).catch((err) => console.warn('Excel write failed:', err.message)));
+
     return res.status(201).json({ message: 'Thank you! We have received your question and will reply on WhatsApp.' });
   } catch (error) {
     console.error('Unable to save visitor question:', error);
     return res.status(500).json({ message: 'Your question could not be saved. Please try again or speak with our team.' });
+  }
+});
+
+// Export all visitor questions as an Excel file.
+// Protected by EXPORT_SECRET env variable. Usage: GET /api/visitor-questions/export?key=YOUR_SECRET
+app.get('/api/visitor-questions/export', async (req, res) => {
+  const secret = process.env.EXPORT_SECRET;
+  if (!secret || req.query.key !== secret) {
+    return res.status(401).json({ message: 'Unauthorized. Provide a valid ?key= query parameter.' });
+  }
+
+  try {
+    const questions = await VisitorQuestion.find().sort({ createdAt: 1 }).lean();
+    const rows = questions.map((q) => ([
+      new Date(q.createdAt).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' }),
+      q.name,
+      q.mobile,
+      q.question,
+      q.source,
+    ]));
+
+    const workbook = XLSX.utils.book_new();
+    const worksheet = XLSX.utils.aoa_to_sheet([visitorQuestionHeaders, ...rows]);
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Questions');
+
+    const buffer = XLSX.write(workbook, { type: 'buffer', bookType: 'xlsx' });
+    res.setHeader('Content-Disposition', 'attachment; filename="visitor-questions.xlsx"');
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    return res.send(buffer);
+  } catch (error) {
+    console.error('Export failed:', error);
+    return res.status(500).json({ message: 'Export failed. Please try again.' });
   }
 });
 
