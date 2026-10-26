@@ -1,6 +1,6 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { QRCodeSVG } from 'qrcode.react';
+import { useEffect, useRef, useState } from 'react';
 import {
+  ArrowRight,
   CheckCircle2,
   ChevronDown,
   CircleHelp,
@@ -34,6 +34,17 @@ const FAQS = [
     question: 'Will my contact details be shared?',
     answer: 'No. Your name and number are only used by the Swadeshi Innovators team to reply to your question.',
   },
+  {
+    question: 'Where can I find more information about Weave Kiran?',
+    answer: (
+      <>
+        For complete project details, interactive fabric defect simulator, and technical specifications, please visit our website:{' '}
+        <a href="/" className="visitor-faq-link">
+          Go to Swadeshi Innovators Homepage <ArrowRight size={14} />
+        </a>
+      </>
+    ),
+  },
 ];
 
 export function VisitorQuestionPage() {
@@ -44,10 +55,6 @@ export function VisitorQuestionPage() {
   const [voiceNotice, setVoiceNotice] = useState('');
   const recognitionRef = useRef(null);
   const questionBeforeVoiceRef = useRef('');
-  const eventUrl = useMemo(
-    () => import.meta.env.VITE_EVENT_QR_URL || `${window.location.origin}/visitor-question`,
-    [],
-  );
   const videoAvailable = Boolean(DEMO_VIDEO_CONFIG.videoUrl);
 
   useEffect(() => () => recognitionRef.current?.stop(), []);
@@ -161,14 +168,6 @@ export function VisitorQuestionPage() {
       </section>
 
       <section className="visitor-question-layout" aria-label="Ask a question">
-        <aside className="visitor-qr-card">
-          <span className="visitor-qr-label">ON THE EVENT DISPLAY?</span>
-          <h2>Scan to ask from your phone</h2>
-          <div className="visitor-qr-code"><QRCodeSVG value={eventUrl} size={154} level="M" includeMargin /></div>
-          <p>Open this page on your mobile, add your details, and we will respond on WhatsApp.</p>
-          <span className="visitor-qr-url">{eventUrl}</span>
-        </aside>
-
         <div className="visitor-form-card">
           <div className="visitor-form-heading">
             <div><CircleHelp size={22} /></div>
