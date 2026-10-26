@@ -150,12 +150,24 @@ export function VisitorQuestionPage() {
         <div className="visitor-video-card">
           <div className="visitor-video-frame">
             {videoAvailable ? (
-              <iframe
-                src={DEMO_VIDEO_CONFIG.videoUrl}
-                title={DEMO_VIDEO_CONFIG.title}
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-              />
+              DEMO_VIDEO_CONFIG.videoUrl.startsWith('http') ? (
+                <iframe
+                  src={DEMO_VIDEO_CONFIG.videoUrl}
+                  title={DEMO_VIDEO_CONFIG.title}
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                />
+              ) : (
+                <video
+                  src={DEMO_VIDEO_CONFIG.videoUrl}
+                  poster={DEMO_VIDEO_CONFIG.placeholderPoster}
+                  controls
+                  playsInline
+                  style={{ width: '100%', height: '100%', objectFit: 'contain', background: '#000' }}
+                >
+                  Your browser does not support HTML5 video.
+                </video>
+              )
             ) : (
               <>
                 <img src={DEMO_VIDEO_CONFIG.placeholderPoster} alt="Weave Kiran prototype demonstration" />

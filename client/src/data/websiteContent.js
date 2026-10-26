@@ -33,10 +33,10 @@ export const BRAND_CONFIG = {
 export const DEMO_VIDEO_CONFIG = {
   title: 'Weave Kiran Prototype Demonstration',
   caption: 'Watch the live benchtop prototype scan a 1-meter woven fabric sample under computer vision inspection.',
-  videoUrl: '', // e.g., 'https://www.youtube.com/embed/dQw4w9WgXcQ' or local video file
+  videoUrl: '/assets/Video Project 6.mp4', // local MP4 demo video
   placeholderPoster: '/assets/image.png',
-  durationText: '03:42 Demo',
-  available: false, // Set to true once a real video URL or asset is linked
+  durationText: 'Live Demo',
+  available: true,
   note: 'Prototype recorded testing at our innovation workbench. Live interactive simulation is also playable below.',
 };
 

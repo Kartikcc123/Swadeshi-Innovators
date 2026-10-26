@@ -32,13 +32,26 @@ export function VideoModal({ config, onClose, onLaunchSimulator }) {
         <div className="modal-video-body">
           {config.videoUrl ? (
             <div className="video-iframe-wrap">
-              <iframe
-                src={config.videoUrl}
-                title={config.title}
-                frameBorder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-              />
+              {config.videoUrl.startsWith('http') ? (
+                <iframe
+                  src={config.videoUrl}
+                  title={config.title}
+                  frameBorder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                />
+              ) : (
+                <video
+                  src={config.videoUrl}
+                  poster={config.placeholderPoster}
+                  controls
+                  autoPlay
+                  playsInline
+                  style={{ width: '100%', height: '100%', objectFit: 'contain', background: '#000', borderRadius: '8px' }}
+                >
+                  Your browser does not support HTML5 video.
+                </video>
+              )}
             </div>
           ) : (
             <div className="video-preview-standin">
@@ -69,7 +82,9 @@ export function VideoModal({ config, onClose, onLaunchSimulator }) {
             <Info size={16} className="text-muted flex-shrink-0" />
             <small>
               {config.videoUrl
-                ? 'Streaming laboratory video recording.'
+                ? config.videoUrl.startsWith('http')
+                  ? 'Streaming laboratory video recording.'
+                  : 'Playing prototype demonstration video.'
                 : 'Prototype video placeholder ready. You can also explore our live interactive optical simulator right now.'}
             </small>
           </div>
